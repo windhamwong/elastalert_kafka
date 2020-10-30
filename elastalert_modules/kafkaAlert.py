@@ -3,6 +3,9 @@ import logging
 from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
+logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger('elasticsearch').setLevel(logging.DEBUG)
+
 class KafkaAlerter(Alerter):
   """ Push a message to Kafka topic """
   required_options = frozenset([

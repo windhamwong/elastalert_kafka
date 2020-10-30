@@ -14,17 +14,20 @@ class KafkaAlerter(Alerter):
     'kafka_groupID',
     'kafka_topic',
   ])
-  tracer = logging.getLogger('alerts.plugins')
-  tracer.setLevel(logging.DEBUG)
-  tracer.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
+
 
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)
 
-    logging.getLogger().setLevel(logging.DEBUG)
-    logging.getLogger('elasticsearch').setLevel(logging.DEBUG)
+    log = logging.getLogger('alerts.plugins')
+    self.log = log;
+    log.setLevel(logging.DEBUG)
+    log.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
+
+    log.getLogger().setLevel(logging.DEBUG)
+    log.getLogger('elasticsearch').setLevel(logging.DEBUG)
     print("[ElastAlert:Plugin:Kafka:Init] begin init");
-    logging.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
+    log.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
     self.KAFKA_TOPIC = self.rule['kafka_topic']
     self.kafka_GROUPID = self.rule['kafka_groupID'] if self.rule.get('kafka_groupID', None) else 'elastalert'
     self.KAFKA_CONFIG = {
@@ -41,10 +44,10 @@ class KafkaAlerter(Alerter):
       }
     }
     try:
-      logging.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
+      log.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
       self.kafkaInstance = Producer(self.KAFKA_CONFIG)
     except Exception as e:
-      logging.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
+      log.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
 
   def delivery_report(self, err, msg):
     """ Called once for each message produced to indicate delivery result.

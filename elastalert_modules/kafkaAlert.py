@@ -4,9 +4,6 @@ from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
 class KafkaAlerter(Alerter):
-    tracer = logging.getLogger('alerts.plugins')
-    tracer.setLevel(logging.DEBUG)
-    tracer.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
   """ Push a message to Kafka topic """
   required_options = frozenset([
     'kafka_brokers',
@@ -17,6 +14,9 @@ class KafkaAlerter(Alerter):
     'kafka_groupID',
     'kafka_topic',
   ])
+  tracer = logging.getLogger('alerts.plugins')
+  tracer.setLevel(logging.DEBUG)
+  tracer.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
 
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)

@@ -1,4 +1,5 @@
 import json
+import logging
 from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
@@ -16,6 +17,8 @@ class KafkaAlerter(Alerter):
 
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)
+    print("[ElastAlert:Plugin:Kafka:Init] begin init");
+    logging.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
     self.KAFKA_TOPIC = self.rule['kafka_topic']
     self.kafka_GROUPID = self.rule['kafka_groupID'] if self.rule.get('kafka_groupID', None) else 'elastalert'
     self.KAFKA_CONFIG = {
@@ -31,8 +34,11 @@ class KafkaAlerter(Alerter):
         'auto.offset.reset': 'earliest'
       }
     }
-
-    self.kafkaInstance = Producer(self.KAFKA_CONFIG)
+    try:
+      logging.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
+      self.kafkaInstance = Producer(self.KAFKA_CONFIG)
+    except Exception as e:
+      logging.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
 
   def delivery_report(self, err, msg):
     """ Called once for each message produced to indicate delivery result.

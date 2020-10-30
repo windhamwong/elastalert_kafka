@@ -4,6 +4,7 @@ from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
 class KafkaAlerter(Alerter):
+  print("[ElastAlert:Plugin:Kafka] init")
   """ Push a message to Kafka topic """
   required_options = frozenset([
     'kafka_brokers',
@@ -18,16 +19,8 @@ class KafkaAlerter(Alerter):
 
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)
-
-    log = logging.getLogger('alerts.plugins')
-    self.log = log;
-    log.setLevel(logging.DEBUG)
-    log.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
-
-    log.getLogger().setLevel(logging.DEBUG)
-    log.getLogger('elasticsearch').setLevel(logging.DEBUG)
     print("[ElastAlert:Plugin:Kafka:Init] begin init");
-    log.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
+    self.logger.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
     self.KAFKA_TOPIC = self.rule['kafka_topic']
     self.kafka_GROUPID = self.rule['kafka_groupID'] if self.rule.get('kafka_groupID', None) else 'elastalert'
     self.KAFKA_CONFIG = {
@@ -44,20 +37,22 @@ class KafkaAlerter(Alerter):
       }
     }
     try:
-      log.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
+      self.logger.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
       self.kafkaInstance = Producer(self.KAFKA_CONFIG)
     except Exception as e:
-      log.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
+      self.logger.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
 
   def delivery_report(self, err, msg):
     """ Called once for each message produced to indicate delivery result.
       Triggered by poll() or flush(). """
+    self.logger.debug("[ElastAlert:Plugin:Kafka:Delivery_report] start");
     if err is not None: # Not breaking
       print('[*] Message Delivery Error: {}'.format(err))
       print('Message Delivery: {}'.format(msg))
 
   def alert(self, matches):
     try:
+      self.logger.debug("[ElastAlert:Plugin:Kafka:Alert] start");
       body = self.create_alert_body(matches)
       if isinstance(body, dict) or isinstance(body, list):
         body = json.dumps(body)
@@ -65,8 +60,11 @@ class KafkaAlerter(Alerter):
       self.kafkaInstance.poll(0)
       self.kafkaInstance.produce(self.KAFKA_TOPIC, body, callback=self.delivery_report)
       self.kafkaInstance.flush()
+      self.logger.debug("[ElastAlert:Plugin:Kafka:Alert] end");
     except Exception as e:
+      self.logger.error("[ElastAlert:Plugin:Kafka:Alert:ERROR] error = %s", e);
       print("[*] [KafkaAlert] %s" % str(e))
+
 
   def get_info(self):
     return {

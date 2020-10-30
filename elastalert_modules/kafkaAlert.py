@@ -3,8 +3,11 @@ import logging
 from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
+kafka_logger = logging.getLogger('kafka_logger')
+kafka_logger.setLevel(logging.DEBUG)
+
 class KafkaAlerter(Alerter):
-  print("[ElastAlert:Plugin:Kafka] init")
+  kafka_logger.info("[ElastAlert:Plugin:Kafka] init")
   """ Push a message to Kafka topic """
   required_options = frozenset([
     'kafka_brokers',
@@ -20,7 +23,7 @@ class KafkaAlerter(Alerter):
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)
     print("[ElastAlert:Plugin:Kafka:Init] begin init");
-    self.logger.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
+    kafka_logger.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
     self.KAFKA_TOPIC = self.rule['kafka_topic']
     self.kafka_GROUPID = self.rule['kafka_groupID'] if self.rule.get('kafka_groupID', None) else 'elastalert'
     self.KAFKA_CONFIG = {

@@ -3,10 +3,10 @@ import logging
 from elastalert.alerts import Alerter
 from confluent_kafka import Producer, KafkaError
 
-logging.getLogger().setLevel(logging.DEBUG)
-logging.getLogger('elasticsearch').setLevel(logging.DEBUG)
-
 class KafkaAlerter(Alerter):
+    tracer = logging.getLogger('alerts.plugins')
+    tracer.setLevel(logging.DEBUG)
+    tracer.addHandler(logging.FileHandler('/var/log/datana_plugins.log'))
   """ Push a message to Kafka topic """
   required_options = frozenset([
     'kafka_brokers',
@@ -20,6 +20,9 @@ class KafkaAlerter(Alerter):
 
   def __init__(self, rule):
     super(KafkaAlerter, self).__init__(rule)
+
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.getLogger('elasticsearch').setLevel(logging.DEBUG)
     print("[ElastAlert:Plugin:Kafka:Init] begin init");
     logging.debug("[ElastAlert:Plugin:Kafka:Init] begin init");
     self.KAFKA_TOPIC = self.rule['kafka_topic']

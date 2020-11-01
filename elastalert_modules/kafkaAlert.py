@@ -43,7 +43,7 @@ class KafkaAlerter(Alerter):
             kafka_logger.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
             self.kafkaInstance = Producer(self.KAFKA_CONFIG)
         except Exception as e:
-            kafka_logger.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s" % (e))
+            kafka_logger.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s", e)
 
     def delivery_report(self, err, msg):
         """ Called once for each message produced to indicate delivery result.

@@ -40,9 +40,9 @@ class KafkaAlerter(Alerter):
             }
         }
         try:
-            kafka_logger.debug("[ElastAlert:Plugin:Kafka:Init] try create Kafka Producer");
+            kafka_logger.debug("[ElastAlert:Plugin:Kafka:Init] Begin: create Kafka Producer");
             self.kafkaInstance = Producer(self.KAFKA_CONFIG)
-
+            kafka_logger.debug("[ElastAlert:Plugin:Kafka:Init] End: create Kafka Producer");
         except Exception as e:
             kafka_logger.exception("[ElastAlert:Plugin:Kafka:Init] Error init kafkaInstance: %s", e)
 

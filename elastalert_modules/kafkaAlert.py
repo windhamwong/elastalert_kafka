@@ -12,8 +12,13 @@ class KafkaAlerter(Alerter):
     """ Push a message to Kafka topic """
     required_options = frozenset([
         'kafka_brokers',
+        'kafka_ca_location',
+        'kafka_pub_location',
+        'kafka_priv_location',
+        'kafka_priv_pass',
         'kafka_groupID',
         'kafka_topic',
+        'kafka_security_protocol',
     ])
 
     def __init__(self, rule):
@@ -23,6 +28,11 @@ class KafkaAlerter(Alerter):
         self.kafka_GROUPID = self.rule['kafka_groupID'] if self.rule.get('kafka_groupID', None) else 'elastalert'
         self.KAFKA_CONFIG = {
             'bootstrap.servers': self.rule['kafka_brokers'],
+            'security.protocol': self.rule['kafka_security_protocol'],
+            'ssl.ca.location': self.rule['kafka_ca_location'],
+            'ssl.certificate.location': self.rule['kafka_pub_location'],
+            'ssl.key.location': self.rule['kafka_priv_location'],
+            'ssl.keystore.password': self.rule['kafka_priv_pass'],
             'group.id': self.kafka_GROUPID,
 
             'default.topic.config': {

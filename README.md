@@ -31,6 +31,13 @@ kafka_brokers: "localhost:9091"
 kafka_groupID: "elastalert"
 # Kafka topic
 kafka_topic: "elastalert-alert"
+
+## SSL or PLAINTEXT
+kafka_security_protocol: "PLAINTEXT"
+kafka_pub_location:
+kafka_ca_location:
+kafka_priv_location:
+kafka_priv_pass:
 ```
 
 2b. Multiple Kafka topics (Untested)
